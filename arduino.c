@@ -1,7 +1,7 @@
 #include <LiquidCrystal.h>
 
 LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
-const char* selection[7] = {"Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5", "Slot 6", "Exit"};
+const char* selection[8] = {"Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5", "Slot 6", "Exit", "Demo"};
 const char* menu[4] = {"Pill Size", "Interval", "Amount", "Exit"};
 int value[6][3] = {
   {0, 0, 0},
@@ -54,7 +54,9 @@ void loop() {
     else if (process == "Selection") {
       if (selectum == 6) {
         process = "Home";
-        selectum = 0;
+        selectum = 0;        
+      } else if (selectum == 7) {
+        Serial.println("Demo Play");
       } else {
         process = "Setting";
         Serial.println("Slot: " + String(selectum));
@@ -76,7 +78,7 @@ void loop() {
   if (encoderPos != lastEncoderPos) {
     if (encoderPos > lastEncoderPos) {
       if (process == "Selection") {
-        selectum = (selectum + 1) % 7;
+        selectum = (selectum + 1) % 8;
         Serial.println("Slot: " + String(selectum));
       } else if (process == "Setting" && buttonClick == false) {
         menum = (menum + 1) % 4;
@@ -104,7 +106,7 @@ void loop() {
       }
     } else {
       if (process == "Selection") {
-        selectum = (selectum + 6) % 7;
+        selectum = (selectum + 7) % 8;
         Serial.println("Slot: " + String(selectum));
       } else if (process == "Setting" && buttonClick == false) {
         menum = (menum + 3) % 4;
