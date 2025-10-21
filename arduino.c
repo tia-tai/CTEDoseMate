@@ -1,0 +1,140 @@
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
+const char* selection[7] = {"Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5", "Slot 6", "Exit"};
+const char* menu[4] = {"Pill Size", "Interval", "Amount", "Exit"};
+int value[6][3] = {
+  {0, 0, 0},
+  {0, 0, 0},
+  {0, 0, 0},
+  {0, 0, 0},
+  {0, 0, 0},
+  {0, 0, 0}
+};
+int potValueInit;
+int potValue;
+int menum = 0;
+int selectum = 0;
+int buttonVal = 0;
+bool buttonClick = false;
+String process = "Home";
+int increase = 0;
+
+void setup() {
+  Serial.begin(9600);
+  lcd.begin(16, 2);
+  lcd.clear();
+  pinMode(6, INPUT_PULLUP);
+  potValue = analogRead(A0);
+  potValueInit = potValue;
+}
+
+void loop() {
+  potValue = analogRead(A0);
+  buttonVal = digitalRead(6);
+
+  if (process == "Home") {
+    set_Home();
+  } else if (process == "Selection"){
+    set_Selection(selectum);
+  } else if (process == "Setting") {
+    set_Setting(selectum, menum);
+  }
+
+  if (buttonVal == LOW) {
+    if (process == "Home") {
+      process = "Selection";
+    }
+    else if (process == "Selection") {
+      if (selectum == 6) {
+        process = "Home";
+        selectum = 0;
+      } else {
+        process = "Setting";
+        Serial.println("Slot: " + String(selectum));
+      }
+    }
+    else if (process == "Setting") {
+      if (menu[menum] == "Exit"){
+        process = "Selection";
+        menum = 0;
+      } else if (buttonClick == false) {
+        buttonClick = true;
+      } else {
+        buttonClick = false;
+      }
+    }
+    delay(500);
+  }
+
+  if (potValue < potValueInit - 10){
+    if (process == "Selection") {
+      selectum = (selectum + 6) % 7;
+      Serial.println("Slot: " + String(selectum));
+    } else if (process == "Setting" && buttonClick == false) {
+      menum = (menum + 3) % 4;
+    } else if (process == "Setting" && buttonClick == true) {
+      value[selectum][menum] = (value[selectum][menum] > 0) ? value[selectum][menum] - 1 : 0;
+      Serial.println(String(menu[menum]) + ": " + String(value[selectum][menum]));
+    }
+  } else if (potValue > potValueInit + 10) {
+    if (process == "Selection") {
+      selectum = (selectum + 1) % 7;
+      Serial.println("Slot: " + String(selectum));
+    } else if (process == "Setting" && buttonClick == false) {
+      menum = (menum + 1) % 4;
+    } else if (process == "Setting" && buttonClick == true) {
+      if (menu[menum] == "Pill Size") {
+        if (value[selectum][menum] < 5) {
+          increase = 1;
+        }
+      } else if (menu[menum] == "Interval") {
+        if (value[selectum][menum] < 48) {
+          increase = 1;
+        }
+      } else if (menu[menum] = "Amount") {
+        if (value[selectum][menum] < 10) {
+          increase = 1;
+        }
+      }
+      value[selectum][menum] = value[selectum][menum] + increase;
+      increase = 0;
+      Serial.println(String(menu[menum]) + ": " + String(value[selectum][menum]));
+    }
+  }
+
+  if (buttonVal == LOW || potValue < potValueInit - 9 || potValue > potValueInit + 9) {
+    lcd.clear();
+  }
+
+  if (potValue < potValueInit - 10 || potValue > potValueInit + 10) {
+    potValueInit = potValue;
+  }
+
+}
+
+void set_Home() {
+  lcd.setCursor(0, 0);
+  lcd.print("Welcome To DoseMate");
+  lcd.setCursor(0, 1);
+  lcd.print("Tap for Menu");
+}
+void set_Selection(int selectum2) {
+  lcd.setCursor(0, 0);
+  lcd.print(selection[selectum2]);
+}
+void set_Setting(int selectum2, int menum) {
+  if (menum == 3) {
+    lcd.setCursor(0, 0);
+    lcd.print(menu[menum]);
+  } else {
+    lcd.setCursor(0, 0);
+    lcd.print(menu[menum]);
+    lcd.setCursor(0, 1);
+    lcd.print(value[selectum2][menum]);
+    if (menu[menum] == "Interval") {
+      lcd.setCursor(11, 1);
+      lcd.print("HOURS");
+    }
+  }
+}
