@@ -3,8 +3,8 @@
 #include <WiFiUdp.h>
 #include <ESP32Servo.h>
 
-const char *ssid     = "Chen";
-const char *password = "ChenYanYun";
+const char *ssid     = "GOVERNMENTSPY";
+const char *password = "mrtakeyobi";
 
 Servo sizeSelector;
 Servo slotSelector;
@@ -50,13 +50,17 @@ void loop() {
     Serial.println(formattedTime);
   }
 
-  if (Serial.available() > 0) {
+  if (Serial2.available()) {
+    Serial.println("Hi");
     datam = Serial2.readStringUntil('\n');
+    Serial.println(datam);
 
     int spaceIndex = datam.indexOf(' ');
 
     String firstWord = datam.substring(0, spaceIndex);
     String slotNumber = datam.substring(spaceIndex + 1);
+    Serial.println(firstWord);
+    Serial.println(slotNumber);
    
     if (firstWord == "Slot:") {
       selectum = slotNumber.toInt();
@@ -70,7 +74,23 @@ void loop() {
     }
   }
 
-  // Task: Create a for loop through the array and find if the time is up and then find the servo controls to let one out. Sound the buzzer afterward.
+  for (int i = 0; i <= 5; i++) {
+    int pillsize;
+    int interval;
+    int amount;
+    for (int x = 0; x <= 2; x++) {
+      if(x==0) {
+        pillsize = values[i][x];
+      } else if(x==1) {
+        interval = values[i][x];
+      } else if(x==2) {
+        amount = values[i][x];
+      }
+    }
+    if (interval == (currentHour*60)+currentMinute) {
+      //Do servo thing
+    }
+  }
 
   delay(1000);
 }
