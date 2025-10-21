@@ -18,8 +18,8 @@ bool buttonClick = false;
 String process = "Home";
 int increase = 0;
 
-const int encoderPinA = 2;
-const int encoderPinB = 3;
+const int encoderPinA = 3;
+const int encoderPinB = 5;
 int encoderPos = 0;    
 int lastEncoderPos = 0;
 
@@ -117,7 +117,7 @@ void loop() {
         }
       }
     }
-    
+   
     lastEncoderPos = encoderPos;
     lcd.clear();
   }
@@ -157,10 +157,10 @@ void set_Setting(int selectum2, int menum) {
 void checkEncoder() {
   int a = digitalRead(encoderPinA);
   int b = digitalRead(encoderPinB);
-
+ 
   static int lastA = LOW;
   static int lastB = LOW;
-  
+ 
   if (a != lastA || b != lastB) {
     if (lastA == LOW && a == HIGH) {
       if (b == LOW) {
@@ -169,7 +169,7 @@ void checkEncoder() {
         encoderPos--;
       }
     }
-    
+   
     lastA = a;
     lastB = b;
   }
