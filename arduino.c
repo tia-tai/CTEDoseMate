@@ -75,7 +75,11 @@ void loop() {
       menum = (menum + 3) % 4;
     } else if (process == "Setting" && buttonClick == true) {
       value[selectum][menum] = (value[selectum][menum] > 0) ? value[selectum][menum] - 1 : 0;
-      Serial.println(String(menu[menum]) + ": " + String(value[selectum][menum]));
+      if (menum == 0){
+        Serial.println("Size: " + String(value[selectum][menum]));
+      } else {
+        Serial.println(String(menu[menum]) + ": " + String(value[selectum][menum]));
+      }
     }
   } else if (potValue > potValueInit + 10) {
     if (process == "Selection") {
@@ -84,22 +88,26 @@ void loop() {
     } else if (process == "Setting" && buttonClick == false) {
       menum = (menum + 1) % 4;
     } else if (process == "Setting" && buttonClick == true) {
+      String category;
       if (menu[menum] == "Pill Size") {
         if (value[selectum][menum] < 5) {
           increase = 1;
+          category = "Size: ";
         }
       } else if (menu[menum] == "Interval") {
         if (value[selectum][menum] < 48) {
           increase = 1;
+          category = "Interval: ";
         }
       } else if (menu[menum] = "Amount") {
         if (value[selectum][menum] < 10) {
           increase = 1;
+          category = "Amount: ";
         }
       }
       value[selectum][menum] = value[selectum][menum] + increase;
       increase = 0;
-      Serial.println(String(menu[menum]) + ": " + String(value[selectum][menum]));
+      Serial.println(category + String(value[selectum][menum]));
     }
   }
 
