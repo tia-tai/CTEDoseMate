@@ -2,10 +2,9 @@
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <ESP32Servo.h>
-#include <string.h>
 
-const char *ssid     = "Galaxy S24 Ultra 2CA9";
-const char *password = "mrtakeyobi";
+const char *ssid     = "Chen";
+const char *password = "ChenYanYun";
 
 Servo sizeSelector;
 Servo slotSelector;
@@ -54,24 +53,24 @@ void loop() {
   if (Serial.available() > 0) {
     datam = Serial2.readStringUntil('\n');
 
-    char charBuffer[datam.length() + 1];
-    datam.toCharArray(charBuffer, sizeof(charBuffer));
+    int spaceIndex = datam.indexOf(' ');
 
-    char* token = strtok(charBuffer, " ");
-
+    String firstWord = datam.substring(0, spaceIndex);
+    String slotNumber = datam.substring(spaceIndex + 1);
    
-    if (String(token) == "Slot:") {
-      selectum = (int)strtok(NULL, " ");
-    } else if (String(token) == "Size:") {
-      values[selectum][0] = (int)strtok(NULL, " ");
-    } else if (String(token) == "Interval:") {
-      hourTo = (currentHour + (int)strtok(NULL, " ")) % 24;
-      values[selectum][1] = (String)hourTo + ":" + (String)currentMinute;
-      Serial.println(value[selectum][1]);
-    } else if (String(token) == "Amount:") {
-      values[selectum][2] = (int)strtok(NULL, " ");
+    if (firstWord == "Slot:") {
+      selectum = slotNumber.toInt();
+    } else if (firstWord == "Size:") {
+      values[selectum][0] = slotNumber.toInt();
+    } else if (firstWord == "Interval:") {
+      hourTo = (currentHour + slotNumber.toInt()) % 24;
+      values[selectum][1] = (hourTo*60)+currentMinute;
+    } else if (firstWord == "Amount:") {
+      values[selectum][2] = slotNumber.toInt();
     }
   }
+
+  // Task: Create a for loop through the array and find if the time is up and then find the servo controls to let one out. Sound the buzzer afterward.
 
   delay(1000);
 }
